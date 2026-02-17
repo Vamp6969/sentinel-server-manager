@@ -67,10 +67,10 @@ case $choice in
         else
             echo "Docker is not active. Please investigate." | lolcat
         fi
-        if systemctl is-active --quiet pterodactyl; then
-            echo "Pterodactyl is active and running." | lolcat
+        if systemctl is-active --quiet wings; then
+            echo "Wings is active and running." | lolcat
         else
-            echo "Pterodactyl is not active. Please investigate." | lolcat
+            echo "Wings is not active. Please investigate." | lolcat
         fi
         echo "All services checked. If any service is not active, please investigate further."
         discord_message="Sentinel Dashboard: Server status check completed. Please review the output for any issues."
@@ -101,7 +101,6 @@ case $choice in
         echo ""
         echo "RAM Usage:"
         free -h | grep "Mem" | awk '{print "Used: "$3" / Total: "$2}' | lolcat
-        echo "System resources checked. Please review the output for any issues."
         echo "Disk Usage:"
         df -h | grep -E '^/dev/sd' | awk '{print $1": Used "$3" / Total "$2" ("$5" used)"}' | lolcat
         discord_message="Sentinel Dashboard: System resource check completed. Please review the output for any issues."
