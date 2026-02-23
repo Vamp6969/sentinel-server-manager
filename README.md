@@ -6,6 +6,7 @@ Sentinel is a lightweight, modular Bash-based dashboard designed for Systems Eng
 
 -   **System Maintenance:** Automates `apt` updates, upgrades, and cleanup.
 -   **Service Monitoring:** One-click status checks for Nginx, MySQL, Docker, and Pterodactyl/Wings.
+-   **Network Monitoring:** Checks active ports, UFW status, and current IP address.
 -   **Log Analysis:** Quickly view the latest logs for Pterodactyl, Paymenter, and Wings.
 -   **Resource Tracking:** Real-time CPU, RAM, and Disk usage statistics.
 -   **Discord Integration:** Sends status reports and maintenance alerts directly to your Discord channel via Webhooks.
