@@ -76,7 +76,7 @@ case $choice in
             echo -e "\e[32m[SUCCESS] Nginx is active and running.\e[0m"
             echo ""
         else
-            echo -e "\e[31m[ERROR]Nginx is not active. Please investigate.\e[0m"
+            echo -e "\e[31m[ERROR] Nginx is not active. Please investigate.\e[0m"
             echo ""
         fi
         if systemctl is-active --quiet mysql; then
