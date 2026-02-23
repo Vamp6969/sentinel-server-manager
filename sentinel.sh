@@ -30,6 +30,8 @@ echo "  1) System Update & Maintenance"
 echo "  2) Server Status"
 echo "  3) Check Log Files (Pterodactyl & Paymenter)"
 echo "  4) Check System Resources (CPU/RAM/Disk)"
+echo "  5) Network Status"
+echo "  6) Exit"
 echo "---------------------------------------------------"
 read -p "Command > " choice
 
@@ -107,6 +109,27 @@ case $choice in
         curl -H "Content-Type: application/json" -X POST -d "{\"content\": \"$discord_message\"}" $WEBHOOK_URL
         pause_prompt
         ;;
+
+    5)
+        echo ""
+        echo ">>> Checking Network Status..."
+        echo "Network Interfaces:"
+        echo "Currently listening on the following network interfaces:" | lolcat
+        ss -tulpn
+        echo "Firewall Status:"
+        sudo ufw status | lolcat
+        echo "Machine IP Address:"
+        ip addr | lolcat
+        echo "Network status check completed. Please review the output for any issues."
+        discord_message="Sentinel Dashboard: Network status check completed. Please review the output for any issues."
+        curl -H "Content-Type: application/json" -X POST -d "{\"content\": \"$discord_message\"}" $WEBHOOK_URL
+        pause_prompt
+        ;;
+
+    6)  
+        echo "Exiting Sentinel Dashboard. Goodbye!" | lolcat
+        exit 0
+        ;;    
     *)
         echo "Invalid option. Please try again."
         ;;
