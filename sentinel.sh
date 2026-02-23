@@ -1,7 +1,15 @@
 #!/bin/bash
 # Version: 1.0
 
-#Install Dependencies for Sentinel
+#Check .env file
+if 
+    [ ! -f .env ]; then 
+    echo -e "\e[31m[ERROR]: .env file missing\e[0m"
+    echo -e "\e[31mCreating .env file from example...\e[0m"
+    cp .env.example .env
+    echo -e "\e[32m.env file created successfully. Please edit the .env file with your configuration before running the script again.\e[0m"
+    exit 1
+fi
 
 #Pause prompt function
 pause_prompt() {
@@ -9,8 +17,13 @@ pause_prompt() {
     read
 }
 
-#Discord Webhook URL for notifications (replace with your actual webhook URL)
+#Discord Webhook URL for notifications
 WEBHOOK_URL=$(grep WEBHOOK_URL .env | cut -d '=' -f2)
+
+#File Directories
+PTERODACTYL_LOG="/var/www/pterodactyl/storage/logs/laravel-$(date +%F).log"
+PAYMENTER_LOG="/var/www/paymenter/storage/logs/laravel-$(date +%F).log"
+WINGS_LOG="/var/log/pterodactyl/wings.log"
 
 ### Script Start ###
 
@@ -97,13 +110,13 @@ case $choice in
         echo ">>> Checking Log Files..." | lolcat
         echo ""
         echo "Pterodactyl Logs:" | lolcat
-        tail -n 100 /var/www/pterodactyl/storage/logs/laravel-$(date +%F).log
+        tail -n 100 $PTERODACTYL_LOG
         echo ""
         echo -e "\nPaymenter Logs:"
-        cd /var/www/paymenter && php artisan app:logs
+        tail -n 100 $PAYMENTER_LOG
         echo ""
         echo "Wings Logs:"
-        tail -n 100 /var/log/pterodactyl/wings.log
+        tail -n 100 $WINGS_LOG
         echo ""
         echo "All log files checked. Please review the output for any issues." | lolcat
         discord_message="Sentinel Dashboard: Log file check completed. Please review the output for any issues."
@@ -156,3 +169,5 @@ case $choice in
         ;;
 esac
 done
+
+### SCRIPT END ###
