@@ -14,15 +14,16 @@ WEBHOOK_URL=$(grep WEBHOOK_URL .env | cut -d '=' -f2)
 
 ### Script Start ###
 
-clear
+while true; do
+    clear
 
-echo -e "\e[0;31m" # Red Color
 figlet "Sentinel Dashboard" | lolcat
-echo -e "\e[97m" # White Color
+echo -e ""
 echo "Welcome to Sentinel Dashboard, your all-in-one server management tool!" | lolcat
 echo "This dashboard allows you to monitor and manage your server with ease." | lolcat
 echo "Please select an option from the menu below to get started." | lolcat
-echo -e "Time: $(date '+%I:%M %p') | Date: $(date '+%d/%m/%Y')"
+echo -e ""
+echo -e "Time: $(date '+%I:%M %p') | Date: $(date '+%d/%m/%Y')" | lolcat
 
 #Main Menu
 echo "---------------------------------------------------"
@@ -38,73 +39,90 @@ read -p "Command > " choice
 case $choice in
     1)
         echo ""
-        echo ">>> Starting System Update & Maintenance..."
+        echo ">>> Starting System Update & Maintenance..." | lolcat
         sudo apt update -y
         sudo apt upgrade -y
         sudo apt full-upgrade -y
+
+        echo ""
         
-        echo ">>> Cleaning up..."
+        echo ">>> Cleaning up..." | lolcat
         sudo apt autoremove -y
         sudo apt autoclean -y
-        echo "System update and maintenance completed."
+        echo ""
+        echo "System update and maintenance completed." | lolcat
         discord_message="Sentinel Dashboard: System update and maintenance completed successfully."
         curl -H "Content-Type: application/json" -X POST -d "{\"content\": \"$discord_message\"}" $WEBHOOK_URL
         pause_prompt
         ;;
     2)
         echo ""
-        echo ">>> Checking Server Status..."
+        echo -e ">>> Checking Server Status..." | lolcat
+        echo ""
         if systemctl is-active --quiet nginx; then
-            echo "Nginx is active and running." | lolcat
+            echo -e "\e[32m[SUCCESS] Nginx is active and running.\e[0m"
+            echo ""
         else
-            echo "Nginx is not active. Please investigate." | lolcat
+            echo -e "\e[31m[ERROR]Nginx is not active. Please investigate.\e[0m"
+            echo ""
         fi
         if systemctl is-active --quiet mysql; then
-            echo "MySQL is active and running." | lolcat
+            echo -e "\e[32m[SUCCESS] MySQL is active and running.\e[0m"
+            echo ""
         else
-            echo "MySQL is not active. Please investigate." | lolcat
+            echo -e "\e[31m[ERROR] MySQL is not active. Please investigate.\e[0m"
+            echo ""
         fi
         if systemctl is-active --quiet docker; then
-            echo "Docker is active and running." | lolcat
+            echo -e "\e[32m[SUCCESS] Docker is active and running.\e[0m"
+            echo ""
         else
-            echo "Docker is not active. Please investigate." | lolcat
+            echo -e "\e[31m[ERROR] Docker is not active. Please investigate.\e[0m"
+            echo ""
         fi
         if systemctl is-active --quiet wings; then
-            echo "Wings is active and running." | lolcat
+            echo -e "\e[32m[SUCCESS] Wings is active and running.\e[0m"
+            echo ""
         else
-            echo "Wings is not active. Please investigate." | lolcat
+            echo -e "\e[31m[ERROR] Wings is not active. Please investigate.\e[0m"
+            echo ""
         fi
-        echo "All services checked. If any service is not active, please investigate further."
+        echo "All services checked. If any service is not active, please investigate further." | lolcat
         discord_message="Sentinel Dashboard: Server status check completed. Please review the output for any issues."
         curl -H "Content-Type: application/json" -X POST -d "{\"content\": \"$discord_message\"}" $WEBHOOK_URL
         pause_prompt
         ;;
     3)
         echo ""
-        echo ">>> Checking Log Files..."
-        echo "Pterodactyl Logs:"
-        tail -n 100 /var/www/pterodactyl/storage/logs/laravel-$(date +%F).log | lolcat
+        echo ">>> Checking Log Files..." | lolcat
+        echo ""
+        echo "Pterodactyl Logs:" | lolcat
+        tail -n 100 /var/www/pterodactyl/storage/logs/laravel-$(date +%F).log
         echo ""
         echo -e "\nPaymenter Logs:"
-        cd /var/www/paymenter && php artisan app:logs | lolcat
+        cd /var/www/paymenter && php artisan app:logs
+        echo ""
         echo "Wings Logs:"
-        tail -n 100 /var/log/pterodactyl/wings.log | lolcat
-        echo "All log files checked. Please review the output for any issues."
+        tail -n 100 /var/log/pterodactyl/wings.log
+        echo ""
+        echo "All log files checked. Please review the output for any issues." | lolcat
         discord_message="Sentinel Dashboard: Log file check completed. Please review the output for any issues."
         curl -H "Content-Type: application/json" -X POST -d "{\"content\": \"$discord_message\"}" $WEBHOOK_URL
         pause_prompt
-
         ;;
     4)
         echo ""
-        echo ">>> Checking System Resources..."
-        echo "CPU Usage:"
-        top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1"%"}' | lolcat
+        echo ">>> Checking System Resources..." | lolcat
         echo ""
-        echo "RAM Usage:"
-        free -h | grep "Mem" | awk '{print "Used: "$3" / Total: "$2}' | lolcat
-        echo "Disk Usage:"
-        df -h | grep -E '^/dev/sd' | awk '{print $1": Used "$3" / Total "$2" ("$5" used)"}' | lolcat
+        echo "CPU Usage:" | lolcat
+        top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1"%"}'
+        echo ""
+        echo "RAM Usage:" | lolcat
+        free -h | grep "Mem" | awk '{print "Used: "$3" / Total: "$2}'
+        echo ""
+        echo "Disk Usage:" | lolcat
+        df -h --total | grep "total" | awk '{print "Used: "$3" / Total: "$2}'
+        echo ""
         discord_message="Sentinel Dashboard: System resource check completed. Please review the output for any issues."
         curl -H "Content-Type: application/json" -X POST -d "{\"content\": \"$discord_message\"}" $WEBHOOK_URL
         pause_prompt
@@ -112,14 +130,17 @@ case $choice in
 
     5)
         echo ""
-        echo ">>> Checking Network Status..."
-        echo "Network Interfaces:"
+        echo ">>> Checking Network Status..." | lolcat
+        echo ""
         echo "Currently listening on the following network interfaces:" | lolcat
         ss -tulpn
-        echo "Firewall Status:"
-        sudo ufw status | lolcat
-        echo "Machine IP Address:"
-        ip addr | lolcat
+        echo ""
+        echo "Firewall Status:" | lolcat
+        sudo ufw status
+        echo ""
+        echo "Machine IP Address:" | lolcat
+        ip address show | grep "inet " | grep -v "127.0.0.1/8" | awk '{print $2}' | cut -d '/' -f1
+        echo ""
         echo "Network status check completed. Please review the output for any issues."
         discord_message="Sentinel Dashboard: Network status check completed. Please review the output for any issues."
         curl -H "Content-Type: application/json" -X POST -d "{\"content\": \"$discord_message\"}" $WEBHOOK_URL
@@ -134,3 +155,4 @@ case $choice in
         echo "Invalid option. Please try again."
         ;;
 esac
+done
